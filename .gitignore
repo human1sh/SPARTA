@@ -1,0 +1,26 @@
+# Python environment & cache
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+*.egg-info/
+.eggs/
+
+# Raw Data and Checkpoints
+data/raw/*
+data/processed/*
+outputs/checkpoints/*
+!data/raw/.gitkeep
+!outputs/checkpoints/.gitkeep
+
+# Testing and Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE files
+.vscode/
+.idea/
+.DS_Store
