@@ -25,19 +25,24 @@ Operational satellite collision avoidance relies on estimating maneuver necessit
 orbital-risk-pinn/
 ├── configs/
 │   └── config.yaml          # Pipeline hyperparameter and path configurations
-├── data/
-│   └── telemetry_2026.csv   # Telemetry dataset
+├── dat/
+│   └── telemetry.csv        # Telemetry dataset
 ├── outputs/
-│   ├── figures/             # Diagnostic plots and ROC curves
+│   ├── 01_calibration_and_roc.png
+│   ├── 02_physics_monotonicity.png
+│   ├── 03_loss_trajectories.png
+│   ├── 04_drag_risk_heatmap.png
+│   ├── 05_risk_probability_distribution.png
 │   ├── pinn_model.pt        # Saved PyTorch model checkpoint
 │   └── predictions.csv      # Output inference predictions
 ├── src/
 │   ├── data.py              # Data ingestion, engineering, and PyTorch DataLoaders
 │   ├── loss.py              # Autograd soft physics monotonicity penalty
 │   ├── models.py            # Residual PINN architecture & TemperatureScaler
+│   ├── plots.py             # Diagnostic and physics verification figure generation
 │   ├── predict.py           # Batch inference script
 │   ├── train.py             # Dedicated model training CLI
-│   └── utils.py             # Evaluation metrics and diagnostic plotting
+│   └── utils.py             # Evaluation metrics and calibration utilities
 ├── tests/
 │   └── test_pipeline.py     # Automated pytest test suite
 ├── main.py                  # Root unified entry point script

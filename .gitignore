@@ -4,8 +4,6 @@ __pycache__/
 .eggs/
 
 # Raw Data and Checkpoints
-data/raw/*
-data/processed/*
 outputs/*
 notebook.ipynb
 
