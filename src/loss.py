@@ -32,5 +32,6 @@ class MonotonicityPhysicsLoss(nn.Module):
         )[0]
 
         miss_grads = grads[:, self.miss_distance_idx]
+        # Soft ReLU penalty on positive gradients
         physics_penalty = torch.mean(torch.relu(miss_grads))
         return self.penalty_lambda * physics_penalty

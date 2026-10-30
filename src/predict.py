@@ -13,10 +13,12 @@ from src.models import AstrodynamicPINN, TemperatureScaler
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     """Engineers non-linear astrodynamic features to match model inputs."""
     df_eng = df.copy()
+
     if "miss_distance_total_m" in df_eng.columns:
         df_eng["log_miss_total"] = np.log1p(df_eng["miss_distance_total_m"])
     if "collision_probability_raw" in df_eng.columns:
         df_eng["log_raw_prob"] = np.log1p(df_eng["collision_probability_raw"] * 1e6)
+
     if all(
         c in df_eng.columns
         for c in [
@@ -28,6 +30,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
         df_eng["drag_risk_proxy"] = (
             df_eng["solar_flux_f10_7_index"] / df_eng["orbit_altitude_km"]
         ) * df_eng["collision_probability_raw"]
+
     if all(
         c in df_eng.columns
         for c in ["collision_probability_raw", "time_to_closest_approach_hours"]
@@ -35,6 +38,36 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
         df_eng["time_decay_risk"] = df_eng["collision_probability_raw"] / (
             df_eng["time_to_closest_approach_hours"] + 1.0
         )
+
+    if all(
+        c in df_eng.columns
+        for c in [
+            "radial_miss_distance_m",
+            "in_track_miss_distance_m",
+            "cross_track_miss_distance_m",
+            "mahalanobis_covariance_miss_distance",
+        ]
+    ):
+        df_eng["covariance_ellipsoid_proxy"] = (
+            df_eng["radial_miss_distance_m"]
+            * df_eng["in_track_miss_distance_m"]
+            * df_eng["cross_track_miss_distance_m"]
+        ) / (df_eng["mahalanobis_covariance_miss_distance"] + 1e-6)
+
+    if all(
+        c in df_eng.columns
+        for c in [
+            "atmospheric_density_kg_m3",
+            "solar_flux_f10_7_index",
+            "solar_storm_drag_amplification_factor",
+        ]
+    ):
+        df_eng["space_weather_drag_impact"] = (
+            df_eng["atmospheric_density_kg_m3"]
+            * df_eng["solar_flux_f10_7_index"]
+            * df_eng["solar_storm_drag_amplification_factor"]
+        )
+
     return df_eng
 
 
@@ -80,10 +113,17 @@ def main() -> None:
         "hard_body_radius_sum_m",
         "solar_flux_f10_7_index",
         "geomagnetic_ap_index",
+        "atmospheric_density_kg_m3",
+        "orbital_decay_rate_m_day",
+        "solar_storm_drag_amplification_factor",
+        "mahalanobis_covariance_miss_distance",
+        "confidence_score",
         "log_miss_total",
         "log_raw_prob",
         "drag_risk_proxy",
         "time_decay_risk",
+        "covariance_ellipsoid_proxy",
+        "space_weather_drag_impact",
     ]
     feature_cols = [c for c in candidate_features if c in df.columns]
 
