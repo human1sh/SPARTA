@@ -5,7 +5,6 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-
 class ResidualBlock(nn.Module):
     """Residual Block preventing vanishing gradients in deep networks."""
 

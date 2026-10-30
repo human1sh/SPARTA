@@ -6,11 +6,9 @@ import yaml
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
-from orbital_risk.data import prepare_data_pipeline
-from orbital_risk.loss import MonotonicityPhysicsLoss
-from orbital_risk.models import AstrodynamicPINN, TemperatureScaler
-
+from src.data import prepare_data_pipeline
+from src.loss import MonotonicityPhysicsLoss
+from src.models import AstrodynamicPINN, TemperatureScaler
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train Astrodynamic PINN Model.")

@@ -1,12 +1,13 @@
 """Inference script for predicting collision maneuver risk on telemetry CSVs."""
 
 import argparse
+import os
 import numpy as np
 import pandas as pd
 import torch
 import yaml
 
-from orbital_risk.models import AstrodynamicPINN, TemperatureScaler
+from src.models import AstrodynamicPINN, TemperatureScaler
 
 
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -51,7 +52,7 @@ def main() -> None:
     parser.add_argument(
         "--checkpoint",
         type=str,
-        default="outputs/checkpoints/pinn_model.pt",
+        default="outputs/pinn_model.pt",
         help="Path to trained PyTorch model checkpoint",
     )
     parser.add_argument(
@@ -86,7 +87,6 @@ def main() -> None:
     ]
     feature_cols = [c for c in candidate_features if c in df.columns]
 
-    # Initialize Architecture with Correct Dimension (16)
     model = AstrodynamicPINN(
         input_dim=len(feature_cols),
         hidden_dim=config["model"]["hidden_dim"],
@@ -95,10 +95,8 @@ def main() -> None:
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model.eval()
 
-    # Temperature Scaler Initialization
     temp_scaler = TemperatureScaler().to(device)
 
-    # Ingest and Predict
     x_tensor = torch.tensor(df[feature_cols].values, dtype=torch.float32).to(device)
     with torch.no_grad():
         raw_logits = model(x_tensor)
@@ -108,6 +106,7 @@ def main() -> None:
     raw_df["predicted_maneuver_probability"] = predicted_probs
     raw_df["predicted_avoidance_required"] = (predicted_probs >= 0.5).astype(int)
 
+    os.makedirs(os.path.dirname(args.output_csv), exist_ok=True)
     raw_df.to_csv(args.output_csv, index=False)
     print(f"Inference complete. Predictions saved to {args.output_csv}")
 

@@ -53,12 +53,11 @@ def evaluate_predictions(
     }
     return metrics
 
-
 def plot_diagnostics(
     y_true: np.ndarray,
     raw_probs: np.ndarray,
     calibrated_probs: np.ndarray,
-    save_path: str = "outputs/figures/output.png",
+    save_path: str = "outputs/output.png",
 ) -> None:
     """Generates and saves dual-panel ROC and Calibration diagnostic plot."""
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
